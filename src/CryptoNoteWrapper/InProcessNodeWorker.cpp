@@ -39,6 +39,7 @@
 #include "CryptoNoteCore/DataBaseErrors.h"
 #include "CryptoNoteCore/MainChainStorage.h"
 #include "CryptoNoteCore/RocksDBWrapper.h"
+#include "CryptoNoteCheckpoints.h"
 #include "CryptoNoteProtocol/CryptoNoteProtocolHandler.h"
 #include "InProcessNode/InProcessNode.h"
 #include "Logging/LoggerManager.h"
@@ -313,7 +314,7 @@ INodeAdapter::InitStatus InProcessNodeWorker::initCore() {
       if (!CryptoNote::DatabaseBlockchainCache::checkDBSchemeVersion(*m_database, m_loggerManager))
       {
         m_database->shutdown();
-        m_database->destoy(dbConfig);
+        m_database->destroy(dbConfig);
         m_database->init(dbConfig);
       }
     } catch (const std::system_error& _error) {
@@ -337,7 +338,8 @@ INodeAdapter::InitStatus InProcessNodeWorker::initCore() {
     m_core->load();
     m_protocolHandler.reset(new CryptoNote::CryptoNoteProtocolHandler(m_currency, *m_dispatcher, *m_core, nullptr, m_loggerManager));
     m_nodeServer.reset(new CryptoNote::NodeServer(*m_dispatcher, *m_protocolHandler, m_loggerManager));
-    m_node.reset(new CryptoNote::InProcessNode(*m_core, *m_protocolHandler, *m_dispatcher));
+      // TODO: WTF
+      //m_node.reset(new CryptoNote::InProcessNode(*m_core, *m_protocolHandler, *m_dispatcher));
     m_protocolHandler->set_p2p_endpoint(m_nodeServer.data());
   } catch (const std::runtime_error& _error) {
     WalletLogger::critical(tr("Core init error: %1").arg(_error.what()));
